@@ -12,6 +12,7 @@ perf_tests = [
   'scale',
   'translate',
   'unsharpmask',
+  'transform',
 ]
 
 foreach testname : perf_tests
@@ -29,6 +30,8 @@ foreach testname : perf_tests
       '-DGLIB_DISABLE_DEPRECATION_WARNINGS',
       '-DCLUTTER_DISABLE_DEPRECATION_WARNINGS',
       '-DTESTS_DATA_DIR="@0@"'.format( project_source_root / 'tests' / 'data'),
+      '-g',
+      '-fno-omit-frame-pointer',
     ],
     install: false,
   )
