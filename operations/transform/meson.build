@@ -15,10 +15,31 @@ gegl_transformops_sources = files(
   'translate.c',
 )
 
+halide_generator = executable(
+  'generator',
+  'halide.cpp',
+  dependencies : halide,
+  cpp_args: ['-std=c++17']
+)
+
+halide_lib = custom_target(
+  'generate_halide_lib',
+  output : [
+    'halide_transform.o',
+    'halide_transform.h'
+  ],
+  command : [
+    halide_generator,
+    '@OUTDIR@',
+  ],
+  build_by_default : true
+)
+
 gegl_transformops = shared_module('transformops',
   gegl_transformops_sources,
-  include_directories: geglOperationsInclude,
   dependencies: gegl_operations_common_deps,
+  objects : halide_lib[0],
+  include_directories : geglOperationsInclude,
   link_with: [
     gegl_lib,
   ],
