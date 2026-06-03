@@ -35,10 +35,19 @@ halide_lib = custom_target(
   build_by_default : true
 )
 
+halide_gen_dep = declare_dependency(
+  sources: halide_lib,
+  include_directories: include_directories('.'),
+  link_with: [],  # The .o file is linked via objects: in the module, not here
+)
+
 gegl_transformops = shared_module('transformops',
   gegl_transformops_sources,
-  dependencies: gegl_operations_common_deps,
-  objects : halide_lib[0],
+  dependencies: [
+    gegl_operations_common_deps,
+    halide,
+    halide_gen_dep,
+  ],
   include_directories : geglOperationsInclude,
   link_with: [
     gegl_lib,

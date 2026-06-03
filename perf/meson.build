@@ -18,11 +18,15 @@ perf_tests = [
 foreach testname : perf_tests
   perf_test_exe = executable(testname,
     'test-' + testname + '.c',
-    include_directories: [ rootInclude, geglInclude, ],
+    include_directories: [
+      rootInclude,
+      geglInclude
+    ],
     dependencies: [
       babl,
       glib,
       gobject,
+      halide_gen_dep,
     ],
     link_with: [ gegl_lib, ],
     c_args: [
