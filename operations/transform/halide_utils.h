@@ -16,4 +16,6 @@ void free_halide_buffer(struct halide_buffer_t *buf);
 
 void alloc_halide_matrix(GeglMatrix3 *matrix, struct halide_buffer_t *buf);
 
+void free_halide_matrix(struct halide_buffer_t *buf);
+
 #endif

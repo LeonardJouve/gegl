@@ -57,12 +57,13 @@ void alloc_halide_buffer(uint8_t *data, int32_t width, int32_t height, struct ha
 
     buf->dim = malloc(sizeof(halide_dimension_t) * buf->dimensions);
 
+    buf->dim[2].extent = 3;
+    buf->dim[2].stride = 1;
     buf->dim[0].extent = width;
     buf->dim[0].stride = 1;
     buf->dim[1].extent = height;
     buf->dim[1].stride = width;
-    buf->dim[2].extent = 3;
-    buf->dim[2].stride = 1;
+
 }
 
 void free_halide_buffer(struct halide_buffer_t *buf) {
@@ -70,8 +71,15 @@ void free_halide_buffer(struct halide_buffer_t *buf) {
 }
 
 void alloc_halide_matrix(GeglMatrix3 *matrix, struct halide_buffer_t *buf) {
+    float *data = malloc(sizeof(float) * 3 * 3);
+    for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < 3; j++) {
+            data[i * 3 + j] = (float) matrix->coeff[i][j];
+        }
+    }
+
     *buf = (struct halide_buffer_t){0};
-    buf->host = (uint8_t*) matrix->coeff;
+    buf->host = (uint8_t*) data;
     buf->type.code = halide_type_float;
     buf->type.bits = 32;
     buf->type.lanes = 1;
@@ -84,4 +92,9 @@ void alloc_halide_matrix(GeglMatrix3 *matrix, struct halide_buffer_t *buf) {
     buf->dim[0].stride = 1;
     buf->dim[1].extent = 3;
     buf->dim[1].stride = 3;
+}
+
+void free_halide_matrix(struct halide_buffer_t *buf) {
+    free(buf->dim);
+    free(buf->host);
 }

@@ -12,7 +12,7 @@ gint main(gint argc, gchar **argv) {
     // buffer = test_buffer(width, height, babl_format("R'G'B' u8"));
 
     //bench("transform", buffer, &transform);
-    transform("/Users/christophekunzli/CLionProjects/gegl/test.png");
+    transform("/Users/christophekunzli/CLionProjects/gegl/test5.png");
     gegl_exit();
     return 0;
 }

@@ -1117,7 +1117,8 @@ thread_process (const GeglRectangle *area,
 #include "halide_utils.h"
 
 // TODO remove
-void log_buffer(int width, int height, int bytes_per_pixel, const uint8_t *buf) {
+void log_buffer(int width, int height, int bytes_per_pixel, const uint8_t *buf, const char * name) {
+  g_warning("%s", name);
   for (gint y = 0; y < height; y++) {
     for (gint x = 0; x < width; x++) {
       const size_t offset = (y * width + x) * bytes_per_pixel;
@@ -1135,8 +1136,7 @@ transform_affine (GeglOperation       *operation,
                   GeglBuffer          *src,
                   GeglMatrix3         *matrix,
                   const GeglRectangle *roi,
-                  gint                 level)
-{
+                  gint                 level) {
     // TODO we ignore roi for now
 
     struct halide_buffer_t raw_input, raw_output, raw_matrix;
@@ -1157,7 +1157,7 @@ transform_affine (GeglOperation       *operation,
 
     gegl_buffer_get(src, &read_rect, 1.0, format, raw_image_input, GEGL_AUTO_ROWSTRIDE, GEGL_ABYSS_CLAMP);
 
-    log_buffer(in_width, in_height, bytes_per_pixel, raw_image_input);
+    log_buffer(in_width, in_height, bytes_per_pixel, raw_image_input, "input_buff");
 
     gint out_width = gegl_buffer_get_width(dest);
     gint out_height = gegl_buffer_get_height(dest);
@@ -1166,17 +1166,22 @@ transform_affine (GeglOperation       *operation,
     uint8_t *raw_image_output = g_malloc0(out_size);
     alloc_halide_buffer(raw_image_output, out_width, out_height, &raw_output);
 
-    const int ret = halide_transform(&raw_input, &raw_matrix, &raw_output);
+    g_warning("out_width=%d out_height=%d out_size=%ld", out_width, out_height, out_size);
+
+    const GeglRectangle roi2 = {roi->x, roi->y, out_width, out_height};
+    g_warning("roi_x=%d roi_y=%d roi_width=%d, roi_height=%d", roi2.x, roi2.y, roi2.width, roi2.height);
+    const int ret = halide_transform(&raw_input, &raw_matrix, roi2.x, roi2.y, &raw_output);
     g_assert_cmpint(ret, ==, 0);
 
-    log_buffer(out_width, out_height, bytes_per_pixel, raw_image_output);
+    log_buffer(out_width, out_height, bytes_per_pixel, raw_image_output, "output_buff");
+    for (size_t i=0;i<out_size;i++) g_warning("%02X", raw_image_output[i]);
 
     g_warning("read_rect : x=%d y=%d width=%d height=%d", read_rect.x, read_rect.y, read_rect.width, read_rect.height);
     gegl_buffer_set(dest, roi, level, format, raw_image_output, GEGL_AUTO_ROWSTRIDE);
 
     free_halide_buffer(&raw_input);
     free_halide_buffer(&raw_output);
-    free_halide_buffer(&raw_matrix);
+    free_halide_matrix(&raw_matrix);
     g_free(raw_image_input);
     g_free(raw_image_output);
 }

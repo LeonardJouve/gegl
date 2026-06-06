@@ -4,61 +4,56 @@
 using namespace Halide;
 
 int main(int argc, char **argv) {
-    std::string out_dir = (argc > 1) ? argv[1] : ".";
+    ImageParam input(UInt(8), 3, "input");
+    ImageParam matrix(Float(32), 2, "matrix");
+    Param<int> roi_x{"roi_x"};
+    Param<int> roi_y{"roi_y"};
 
-    ImageParam input(UInt(8), 3, "input"); // x,y,c
-    ImageParam matrix(Float(32), 2, "matrix"); // 3x3
+    Var x, y, color;
 
-    Var x, y, c;
+    Func transform;
 
-    Func out;
+    Expr a = matrix(0,0);
+    Expr b = matrix(0,1);
+    Expr c = matrix(0,2);
+    Expr d = matrix(1,0);
+    Expr e = matrix(1,1);
+    Expr f = matrix(1,2);
+    Expr det = a*e - b*d;
+    Expr ia = e / det;
+    Expr ib = -b / det;
+    Expr ic = (b*f - e*c) / det;
+    Expr id = -d / det;
+    Expr ie = a / det;
+    Expr if_ = (d*c - a*f) / det;
+    //print(a,b,c,d,e,f);
 
-    Expr r = cast<float>(input(x, y, 0));
-    Expr g = cast<float>(input(x, y, 1));
-    Expr b = cast<float>(input(x, y, 2));
+    Expr xf = cast<float>(x) + 0.5f; // 0.5 | 1.5 | 2.5
+    Expr yf = cast<float>(y) + 0.5f; // 0.5
 
-    Expr result[3];
+    Expr u = // 0.5 | 0.5 | 0.5
+        (ia * xf + // 0 | 0 | 0
+        ib * yf + // 0.5 | 0.5 | 0.5
+        ic) ; // 0 | 0 | 0
+    Expr v = // -0.5 (should be 0.5) | -1.5 (should be 1.5) | -2.5 (should be 2.5)
+        (id * xf + // -0.5 | -1.5 | -2.5
+        ie * yf + // 0 | 0 | 0
+        if_) * -1; // 0 | 0 | 0
 
-    result[0] =
-        matrix(0, 0) * r +
-        matrix(0, 1) * g +
-        matrix(0, 2) * b;
+    Expr sx = clamp(cast<int>(floor(u)), 0, input.width() - 1); // 0
+    Expr sy = clamp(cast<int>(floor(v)), 0, input.height() - 1); // 0
 
-    result[1] =
-        matrix(1, 0) * r +
-        matrix(1, 1) * g +
-        matrix(1, 2) * b;
-
-    result[2] =
-        matrix(2, 0) * r +
-        matrix(2, 1) * g +
-        matrix(2, 2) * b;
-
-    out(x, y, c) = cast<uint8_t>(clamp(
-        select(
-            c == 0,
-            result[0],
-            c == 1,
-            result[1],
-            result[2]
-        ),
-        0.0f,
-        255.0f
-    ));
+    transform(x, y, color) = input(print(sx, "x=", x, "y=", y, "u=", cast<int>(floor(u)), "v=", cast<int>(floor(v)), "sx=", sx, "sy=", sy, "color=", color, "value=", input(sx, sy, color)), sy, color);
 
     Target target = get_host_target();
 
+    std::string out_dir = (argc > 1) ? argv[1] : ".";
     std::string filename = out_dir + std::string("/halide_transform");
     std::string function_name = "halide_transform";
 
-    out.compile_to_object(
-        filename + ".o",
-        {input, matrix},
-        function_name,
-        target
-    );
+    transform.compile_to_object(filename + ".o", {input, matrix, roi_x, roi_y}, function_name, target);
 
-    out.compile_to_header(filename + ".h", {input, matrix}, function_name, target);
+    transform.compile_to_header(filename + ".h", {input, matrix, roi_x, roi_y}, function_name, target);
 
     return 0;
 }
