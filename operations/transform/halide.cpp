@@ -14,11 +14,11 @@ int main(int argc, char **argv) {
     Func transform;
 
     Expr a = matrix(0,0);
-    Expr b = matrix(0,1);
-    Expr c = matrix(0,2);
-    Expr d = matrix(1,0);
+    Expr b = matrix(1,0);
+    Expr c = matrix(2,0);
+    Expr d = matrix(0,1);
     Expr e = matrix(1,1);
-    Expr f = matrix(1,2);
+    Expr f = matrix(2,1);
     Expr det = a*e - b*d;
     Expr ia = e / det;
     Expr ib = -b / det;
@@ -36,14 +36,14 @@ int main(int argc, char **argv) {
         ib * yf + // 0.5 | 0.5 | 0.5
         ic) ; // 0 | 0 | 0
     Expr v = // -0.5 (should be 0.5) | -1.5 (should be 1.5) | -2.5 (should be 2.5)
-        (id * xf + // -0.5 | -1.5 | -2.5
+        id * xf + // -0.5 | -1.5 | -2.5
         ie * yf + // 0 | 0 | 0
-        if_) * -1; // 0 | 0 | 0
+        if_; // 0 | 0 | 0
 
-    Expr sx = clamp(cast<int>(floor(u)), 0, input.width() - 1); // 0
-    Expr sy = clamp(cast<int>(floor(v)), 0, input.height() - 1); // 0
+    Expr sx = clamp(cast<int>(floor(u)), 0, input.dim(1).extent() - 1); // 0
+    Expr sy = clamp(cast<int>(floor(v)), 0, input.dim(2).extent() - 1); // 0
 
-    transform(x, y, color) = input(print(sx, "x=", x, "y=", y, "u=", cast<int>(floor(u)), "v=", cast<int>(floor(v)), "sx=", sx, "sy=", sy, "color=", color, "value=", input(sx, sy, color)), sy, color);
+    transform(color,x, y) = input(color, sx, sy);
 
     Target target = get_host_target();
 

@@ -1168,9 +1168,7 @@ transform_affine (GeglOperation       *operation,
 
     g_warning("out_width=%d out_height=%d out_size=%ld", out_width, out_height, out_size);
 
-    const GeglRectangle roi2 = {roi->x, roi->y, out_width, out_height};
-    g_warning("roi_x=%d roi_y=%d roi_width=%d, roi_height=%d", roi2.x, roi2.y, roi2.width, roi2.height);
-    const int ret = halide_transform(&raw_input, &raw_matrix, roi2.x, roi2.y, &raw_output);
+    const int ret = halide_transform(&raw_input, &raw_matrix, roi->x, roi->y, &raw_output);
     g_assert_cmpint(ret, ==, 0);
 
     log_buffer(out_width, out_height, bytes_per_pixel, raw_image_output, "output_buff");

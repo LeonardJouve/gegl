@@ -48,22 +48,23 @@ void u8_buffer_to_gegl(uint8_t *pixels, gint width, gint height, GeglBuffer *buf
 void alloc_halide_buffer(uint8_t *data, int32_t width, int32_t height, struct halide_buffer_t *buf) {
     *buf = (struct halide_buffer_t){0};
     buf->host = data;
-
     buf->type.code = halide_type_uint;
     buf->type.bits = 8;
     buf->type.lanes = 1;
-
     buf->dimensions = 3;
+    buf->dim = malloc(sizeof(halide_dimension_t) * 3);
 
-    buf->dim = malloc(sizeof(halide_dimension_t) * buf->dimensions);
-
-    buf->dim[2].extent = 3;
-    buf->dim[2].stride = 1;
-    buf->dim[0].extent = width;
+    // Dimension 0: Color (Innermost / Contiguous)
+    buf->dim[0].extent = 3;
     buf->dim[0].stride = 1;
-    buf->dim[1].extent = height;
-    buf->dim[1].stride = width;
 
+    // Dimension 1: X (Columns)
+    buf->dim[1].extent = width;
+    buf->dim[1].stride = 3;
+
+    // Dimension 2: Y (Rows)
+    buf->dim[2].extent = height;
+    buf->dim[2].stride = 3 * width;
 }
 
 void free_halide_buffer(struct halide_buffer_t *buf) {
