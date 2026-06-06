@@ -37,6 +37,7 @@
 
 #include "transform-core.h"
 #include "module.h"
+#include "halide_utils.h"
 
 /*
  * Use to determine if key transform matrix coefficients are close
@@ -1108,7 +1109,39 @@ thread_process (const GeglRectangle *area,
   g_object_unref (input);
 }
 
+#define TRANSFORM_HALIDE 0
 
+#ifdef TRANSFORM_HALIDE
+
+static void
+transform_affine (GeglOperation       *operation,
+                  GeglBuffer          *dest,
+                  GeglBuffer          *src,
+                  GeglMatrix3         *matrix,
+                  const GeglRectangle *roi,
+                  gint                 level) {
+  struct halide_buffer_t raw_input, raw_output;
+
+  gint width = gegl_buffer_get_width(src);
+  gint height = gegl_buffer_get_height(src);
+  const Babl *fmt = gegl_buffer_get_format(src);
+
+  uint8_t *raw_image_input = gegl_buffer_to_u8(src);
+  alloc_halide_buffer(raw_image_input, width, height, &raw_input);
+  uint8_t *raw_image_output = alloc_u8_buffer(width, height, fmt);
+  alloc_halide_buffer(raw_image_output, width, height, &raw_output);
+
+  const int ret = halide_transform(&raw_input, &raw_output);
+  g_assert_cmpint(ret, ==, 0);
+
+  u8_buffer_to_gegl(raw_image_output, width, height, dest);
+
+  free_halide_buffer(&raw_input);
+  free_halide_buffer(&raw_output);
+  g_free(raw_image_input);
+  g_free(raw_image_output);
+}
+#else
 static void
 transform_affine (GeglOperation       *operation,
                   GeglBuffer          *dest,
@@ -1264,6 +1297,7 @@ transform_affine (GeglOperation       *operation,
 
   g_object_unref (sampler);
 }
+#endif
 
 static void
 transform_generic (GeglOperation       *operation,
