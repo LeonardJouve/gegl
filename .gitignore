@@ -4,3 +4,6 @@
 
 # Atom
 /.vscode
+
+# JetBrains IDEs
+.idea
