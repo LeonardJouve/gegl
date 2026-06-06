@@ -13,6 +13,7 @@ gegl_transformops_sources = files(
   'transform-core.c',
   'transform.c',
   'translate.c',
+  'halide_utils.c',
 )
 
 halide_generator = executable(

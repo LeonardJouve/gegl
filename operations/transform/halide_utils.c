@@ -1,5 +1,5 @@
 #include <gegl.h>
-
+#include "halide_utils.h"
 #include "halide_transform.h"
 
 // returns allocated data, caller frees
@@ -53,7 +53,7 @@ void alloc_halide_buffer(uint8_t *data, int32_t width, int32_t height, struct ha
     buf->type.bits = 8;
     buf->type.lanes = 1;
 
-    buf->dimensions = 2;
+    buf->dimensions = 3;
 
     buf->dim = malloc(sizeof(halide_dimension_t) * buf->dimensions);
 
@@ -61,8 +61,27 @@ void alloc_halide_buffer(uint8_t *data, int32_t width, int32_t height, struct ha
     buf->dim[0].stride = 1;
     buf->dim[1].extent = height;
     buf->dim[1].stride = width;
+    buf->dim[2].extent = 3;
+    buf->dim[2].stride = 1;
 }
 
 void free_halide_buffer(struct halide_buffer_t *buf) {
     free(buf->dim);
+}
+
+void alloc_halide_matrix(GeglMatrix3 *matrix, struct halide_buffer_t *buf) {
+    *buf = (struct halide_buffer_t){0};
+    buf->host = (uint8_t*) matrix->coeff;
+    buf->type.code = halide_type_float;
+    buf->type.bits = 32;
+    buf->type.lanes = 1;
+
+    buf->dimensions = 2;
+
+    buf->dim = malloc(sizeof(halide_dimension_t) * buf->dimensions);
+
+    buf->dim[0].extent = 3;
+    buf->dim[0].stride = 1;
+    buf->dim[1].extent = 3;
+    buf->dim[1].stride = 3;
 }
