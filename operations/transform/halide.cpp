@@ -28,13 +28,13 @@ int main(int argc, char **argv) {
     Expr if_ = (d*c - a*f) / det;
     //print(a,b,c,d,e,f);
 
-    Expr xf = cast<float>(x) + 0.5f; // 0.5 | 1.5 | 2.5
-    Expr yf = cast<float>(y) + 0.5f; // 0.5
+    Expr xf = cast<float>(x + roi_x) + 0.5f; // 0.5 | 1.5 | 2.5
+    Expr yf = cast<float>(y + roi_y) + 0.5f; // 0.5
 
     Expr u = // 0.5 | 0.5 | 0.5
-        (ia * xf + // 0 | 0 | 0
+        ia * xf + // 0 | 0 | 0
         ib * yf + // 0.5 | 0.5 | 0.5
-        ic) ; // 0 | 0 | 0
+        ic; // 0 | 0 | 0
     Expr v = // -0.5 (should be 0.5) | -1.5 (should be 1.5) | -2.5 (should be 2.5)
         id * xf + // -0.5 | -1.5 | -2.5
         ie * yf + // 0 | 0 | 0

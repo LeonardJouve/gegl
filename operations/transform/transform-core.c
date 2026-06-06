@@ -1157,7 +1157,7 @@ transform_affine (GeglOperation       *operation,
 
     gegl_buffer_get(src, &read_rect, 1.0, format, raw_image_input, GEGL_AUTO_ROWSTRIDE, GEGL_ABYSS_CLAMP);
 
-    log_buffer(in_width, in_height, bytes_per_pixel, raw_image_input, "input_buff");
+    //log_buffer(in_width, in_height, bytes_per_pixel, raw_image_input, "input_buff");
 
     gint out_width = gegl_buffer_get_width(dest);
     gint out_height = gegl_buffer_get_height(dest);
@@ -1166,15 +1166,11 @@ transform_affine (GeglOperation       *operation,
     uint8_t *raw_image_output = g_malloc0(out_size);
     alloc_halide_buffer(raw_image_output, out_width, out_height, &raw_output);
 
-    g_warning("out_width=%d out_height=%d out_size=%ld", out_width, out_height, out_size);
-
     const int ret = halide_transform(&raw_input, &raw_matrix, roi->x, roi->y, &raw_output);
     g_assert_cmpint(ret, ==, 0);
 
-    log_buffer(out_width, out_height, bytes_per_pixel, raw_image_output, "output_buff");
-    for (size_t i=0;i<out_size;i++) g_warning("%02X", raw_image_output[i]);
+    //log_buffer(out_width, out_height, bytes_per_pixel, raw_image_output, "output_buff");
 
-    g_warning("read_rect : x=%d y=%d width=%d height=%d", read_rect.x, read_rect.y, read_rect.width, read_rect.height);
     gegl_buffer_set(dest, roi, level, format, raw_image_output, GEGL_AUTO_ROWSTRIDE);
 
     free_halide_buffer(&raw_input);
