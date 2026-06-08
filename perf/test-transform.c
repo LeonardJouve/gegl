@@ -99,6 +99,7 @@ void benchmark() {
     double averageTime = totalTime / iterations;
 
     printf("Benchmark results (%d iterations):\n", iterations);
+    printf("  Total Time:   %.6f s\n", totalTime);
     printf("  Min Time:     %.6f s\n", minTime);
     printf("  Max Time:     %.6f s\n", maxTime);
     printf("  Average Time: %.6f s\n", averageTime);
