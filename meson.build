@@ -390,7 +390,7 @@ libnsgif = dependency('libnsgif',     version: dep_ver.get('libnsgif'),
   fallback: ['libnsgif', 'libnsgif'],
 )
 
-halide = dependency('halide')
+halide = dependency('halide', version :'21.0.0')
 
 ################################################################################
 # Optionnal Dependencies

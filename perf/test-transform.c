@@ -7,11 +7,11 @@ void transform(const char *in, const char *out);
 void transform_for_benchmark(GeglBuffer *buffer);
 void benchmark();
 
-#define TIME_BENCHMARK // run time benchmark
+#define TIME_BENCHMARK // run time benchmark, comment this to not run the benchmark
 
 #define OUTPUT_BENCHMARK // run output image benchmark, IMAGE_IN and IMAGE_OUT must be set
-#define IMAGE_IN "" // input image path
-#define IMAGE_OUT "" // output image path
+#define IMAGE_IN "/Users/christophekunzli/CLionProjects/gegl/out.png" // input image path
+#define IMAGE_OUT "/Users/christophekunzli/CLionProjects/gegl/out.png" // output image path
 
 gint main(gint argc, gchar **argv) {
     gegl_init(&argc, &argv);
