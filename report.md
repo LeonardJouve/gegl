@@ -3,6 +3,8 @@ Members of the group:
 - Christophe Künzli
 - Léonard Jouve
 
+[Our repository](https://github.com/LeonardJouve/gegl)
+
 # Introduction
 
 During this project, we are requested to analyze the performances of part of an open source project, and propose some
