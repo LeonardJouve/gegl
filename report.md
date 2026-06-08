@@ -206,7 +206,7 @@ Representing transformations as matrices offers several advantages:
 Consequently, matrix-based affine transformations are the standard technique used in modern image processing libraries
 and graphics frameworks.
 
-see these ressources :
+See this ressource :
 
 - https://www.youtube.com/watch?v=E3Phj6J287o
 
@@ -288,12 +288,15 @@ While this is a very simple benchmark, it shows that our implementation using Ha
 original implementation. The average time is reduced by a factor of 5.5, and the min and max times are also
 significantly reduced.
 
+The results are a bit biased as our Halide solution is simplified compared to the existant one and does not act as a
+full replacement but very encouraging.
+
 ## Further improvements and optimizations
 
 - Implementing support for all transform operations, including shearing and scaling.
 - Adding support for more image formats, including those with alpha channels.
-- Optimizing the Halide implementation further by exploring different scheduling strategies and parallelization
-  techniques offered by Halide.
+- Optimizing the Halide implementation further by exploring scheduling strategies and parallelization techniques offered
+  by Halide.
 
 # Difficulties encountered
 
@@ -303,3 +306,19 @@ significantly reduced.
 
 # Conclusion
 
+Benchmark results show a significant performance improvement compared to the current implementation. The Halide-based
+version achieved an average execution time approximately 5.5 times lower than the original implementation, demonstrating
+the potential benefits of using a DSL designed for image processing.
+
+However, the current implementation should not be considered a drop-in replacement for the existing GEGL transform
+operation. Several features supported by the original implementation are not yet implemented, and the benchmark was
+performed on a simplified workload. Consequently, the results should be interpreted as an indication of the potential
+performance gains rather than a direct comparison between two feature-equivalent implementations.
+
+Despite these limitations, the project successfully demonstrates the feasibility of integrating Halide into GEGL for
+affine image transformations. Future work could focus on supporting the complete set of transformation operations,
+improving compatibility with existing image formats, and exploring additional optimization opportunities through
+Halide's scheduling and parallelization capabilities.
+
+Overall, the results are encouraging and suggest that further investigation of a Halide-based implementation is
+justified.
