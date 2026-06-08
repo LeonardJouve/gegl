@@ -1110,14 +1110,14 @@ thread_process (const GeglRectangle *area,
   g_object_unref (input);
 }
 
-#define TRANSFORM_HALIDE 0
+// TODO comment to test non-halide version
+#define TRANSFORM_HALIDE
 
 #ifdef TRANSFORM_HALIDE
 
 #include "halide_utils.h"
 
-// TODO remove
-void log_buffer(int width, int height, int bytes_per_pixel, const uint8_t *buf, const char * name) {
+static void log_buffer(int width, int height, int bytes_per_pixel, const uint8_t *buf, const char * name) {
   g_warning("%s", name);
   for (gint y = 0; y < height; y++) {
     for (gint x = 0; x < width; x++) {
@@ -1137,8 +1137,6 @@ transform_affine (GeglOperation       *operation,
                   GeglMatrix3         *matrix,
                   const GeglRectangle *roi,
                   gint                 level) {
-    // TODO we ignore roi for now
-
     struct halide_buffer_t raw_input, raw_output, raw_matrix;
 
     const Babl *format = babl_format("R'G'B' u8");
